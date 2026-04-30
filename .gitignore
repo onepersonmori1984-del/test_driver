@@ -1,0 +1,18 @@
+# Java
+*.class
+
+# Logs
+*.log
+
+# CData license
+*.lic
+
+# OAuth / config
+*OAuth*.xml
+
+# Claude / local tools
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
