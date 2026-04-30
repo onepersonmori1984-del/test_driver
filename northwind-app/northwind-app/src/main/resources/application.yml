@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: northwind-app
+
+app:
+  sheets:
+    client-id: ${GS_CLIENT_ID:}
+    client-secret: ${GS_CLIENT_SECRET:}
+    spreadsheet: ${GS_SPREADSHEET:Northwind}
+    oauth-settings-location: ${GS_OAUTH_SETTINGS:}
