@@ -17,7 +17,7 @@ import com.example.northwind_app.service.ProductQueryService;
 class ProductControllerTest {
 
 	private final ProductQueryService service = org.mockito.Mockito.mock(ProductQueryService.class);
-	private final ProductController controller = new ProductController(service);
+	private final ProductController sut = new ProductController(service);
 
 	@Test
 	void trimsCountryAndDisplaysProducts() throws Exception {
@@ -25,12 +25,24 @@ class ProductControllerTest {
 		when(service.findByCountry("usa")).thenReturn(rows);
 		ExtendedModelMap model = new ExtendedModelMap();
 
-		String view = controller.index("  usa  ", model);
+		String view = sut.index("  usa  ", model);
 
 		assertThat(view).isEqualTo("index");
 		assertThat(model.get("country")).isEqualTo("usa");
 		assertThat(model.get("products")).isEqualTo(rows);
+		assertThat((Boolean) model.get("showEmptyMessage")).isFalse();
 		verify(service).findByCountry("usa");
+	}
+
+	@Test
+	void showsEmptyMessageWhenNoProductsAreFound() throws Exception {
+		when(service.findByCountry("USA")).thenReturn(List.of());
+		ExtendedModelMap model = new ExtendedModelMap();
+
+		sut.index("USA", model);
+
+		assertThat(model.get("products")).isEqualTo(List.of());
+		assertThat((Boolean) model.get("showEmptyMessage")).isTrue();
 	}
 
 	@Test
@@ -38,9 +50,10 @@ class ProductControllerTest {
 		when(service.findByCountry("USA")).thenThrow(new SQLException("boom"));
 		ExtendedModelMap model = new ExtendedModelMap();
 
-		controller.index("USA", model);
+		sut.index("USA", model);
 
 		assertThat(model.get("errorMessage")).isEqualTo("検索中にエラーが発生しました。接続設定を確認してください。");
 		assertThat(model.get("products")).isEqualTo(List.of());
+		assertThat((Boolean) model.get("showEmptyMessage")).isFalse();
 	}
 }

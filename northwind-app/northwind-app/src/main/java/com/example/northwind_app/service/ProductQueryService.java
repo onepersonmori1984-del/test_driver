@@ -1,6 +1,5 @@
 package com.example.northwind_app.service;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -47,13 +46,7 @@ public class ProductQueryService {
 			try (ResultSet resultSet = statement.executeQuery()) {
 				List<ProductRow> rows = new ArrayList<>();
 				while (resultSet.next()) {
-					rows.add(new ProductRow(
-							resultSet.getInt("ProductID"),
-							resultSet.getString("ProductName"),
-							resultSet.getString("CategoryName"),
-							resultSet.getBigDecimal("UnitPrice"),
-							resultSet.getString("CompanyName"),
-							resultSet.getString("Country")));
+					rows.add(toProductRow(resultSet));
 				}
 				return rows;
 			}
@@ -62,15 +55,25 @@ public class ProductQueryService {
 
 	String jdbcUrl() {
 		StringBuilder url = new StringBuilder("jdbc:googlesheets:");
-		append(url, "OAuthClientId", properties.clientId());
-		append(url, "OAuthClientSecret", properties.clientSecret());
-		append(url, "Spreadsheet", properties.spreadsheet());
+		appendJdbcOption(url, "OAuthClientId", properties.clientId());
+		appendJdbcOption(url, "OAuthClientSecret", properties.clientSecret());
+		appendJdbcOption(url, "Spreadsheet", properties.spreadsheet());
 		url.append("InitiateOAuth=GETANDREFRESH;");
-		append(url, "OAuthSettingsLocation", properties.oauthSettingsLocation());
+		appendJdbcOption(url, "OAuthSettingsLocation", properties.oauthSettingsLocation());
 		return url.toString();
 	}
 
-	private static void append(StringBuilder url, String key, String value) {
+	private static ProductRow toProductRow(ResultSet resultSet) throws SQLException {
+		return new ProductRow(
+				resultSet.getInt("ProductID"),
+				resultSet.getString("ProductName"),
+				resultSet.getString("CategoryName"),
+				resultSet.getBigDecimal("UnitPrice"),
+				resultSet.getString("CompanyName"),
+				resultSet.getString("Country"));
+	}
+
+	private static void appendJdbcOption(StringBuilder url, String key, String value) {
 		if (value != null && !value.isBlank()) {
 			url.append(key).append("=").append(value.trim()).append(";");
 		}

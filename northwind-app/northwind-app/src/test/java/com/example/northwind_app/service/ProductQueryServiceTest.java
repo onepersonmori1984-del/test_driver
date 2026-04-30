@@ -32,14 +32,14 @@ class ProductQueryServiceTest {
 				"UnitPrice", new BigDecimal("18.00"),
 				"CompanyName", "Exotic Liquids",
 				"Country", "USA"));
-		ProductQueryService service = new ProductQueryService(
+		ProductQueryService sut = new ProductQueryService(
 				new SheetsProperties("client", "secret", "Northwind", "C:\\oauth.xml"),
 				url -> {
 					jdbcUrl.set(url);
 					return connection(sql, parameter, data);
 				});
 
-		List<ProductRow> rows = service.findByCountry("  usa  ");
+		List<ProductRow> rows = sut.findByCountry("  usa  ");
 
 		assertThat(sql.get()).contains("UPPER(TRIM(s.Country)) = UPPER(TRIM(?))");
 		assertThat(sql.get()).contains("ORDER BY p.ProductName");
@@ -55,14 +55,14 @@ class ProductQueryServiceTest {
 	@Test
 	void blankCountryReturnsNoRowsWithoutOpeningConnection() throws Exception {
 		AtomicInteger openCount = new AtomicInteger();
-		ProductQueryService service = new ProductQueryService(
+		ProductQueryService sut = new ProductQueryService(
 				new SheetsProperties("", "", "Northwind", ""),
 				url -> {
 					openCount.incrementAndGet();
 					throw new AssertionError("connection should not be opened");
 				});
 
-		assertThat(service.findByCountry("   ")).isEmpty();
+		assertThat(sut.findByCountry("   ")).isEmpty();
 		assertThat(openCount).hasValue(0);
 	}
 

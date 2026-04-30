@@ -22,20 +22,25 @@ public class ProductController {
 
 	@GetMapping("/")
 	public String index(@RequestParam(name = "country", required = false) String country, Model model) {
-		String trimmedCountry = country == null ? "" : country.trim();
-		model.addAttribute("country", trimmedCountry);
-		model.addAttribute("products", List.of());
+		String searchCountry = country == null ? "" : country.trim();
+		List<ProductRow> products = List.of();
+		boolean showEmptyMessage = false;
+		String errorMessage = null;
 
-		if (trimmedCountry.isEmpty()) {
-			return "index";
+		if (!searchCountry.isEmpty()) {
+			try {
+				products = productQueryService.findByCountry(searchCountry);
+				showEmptyMessage = products.isEmpty();
+			}
+			catch (SQLException ex) {
+				errorMessage = "検索中にエラーが発生しました。接続設定を確認してください。";
+			}
 		}
 
-		try {
-			model.addAttribute("products", productQueryService.findByCountry(trimmedCountry));
-		}
-		catch (SQLException ex) {
-			model.addAttribute("errorMessage", "検索中にエラーが発生しました。接続設定を確認してください。");
-		}
+		model.addAttribute("country", searchCountry);
+		model.addAttribute("products", products);
+		model.addAttribute("showEmptyMessage", showEmptyMessage);
+		model.addAttribute("errorMessage", errorMessage);
 		return "index";
 	}
 }

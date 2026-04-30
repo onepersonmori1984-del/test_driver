@@ -4,78 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Northwind Product Search</title>
-  <style>
-    body {
-      color: #1f2937;
-      font-family: Arial, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
-      margin: 0;
-      background: #f6f7f9;
-    }
-    main {
-      max-width: 1040px;
-      margin: 0 auto;
-      padding: 32px 20px;
-    }
-    h1 {
-      font-size: 28px;
-      margin: 0 0 24px;
-    }
-    form {
-      display: flex;
-      gap: 10px;
-      align-items: end;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-    label {
-      display: grid;
-      gap: 6px;
-      font-weight: 700;
-    }
-    input {
-      width: min(360px, 80vw);
-      padding: 10px 12px;
-      border: 1px solid #b8c0cc;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-    button {
-      padding: 10px 18px;
-      border: 0;
-      border-radius: 6px;
-      background: #176b87;
-      color: white;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .message {
-      padding: 12px 14px;
-      border-radius: 6px;
-      background: #fff4e5;
-      color: #7a4100;
-      margin-bottom: 18px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border: 1px solid #d5dbe3;
-    }
-    th, td {
-      padding: 10px 12px;
-      border-bottom: 1px solid #e5e9ef;
-      text-align: left;
-    }
-    th {
-      background: #eaf1f5;
-      font-size: 14px;
-    }
-    .empty {
-      color: #586272;
-      margin-top: 18px;
-    }
-  </style>
+  <link rel="stylesheet" th:href="@{/css/index.css}" href="/css/index.css">
 </head>
 <body>
 <main>
@@ -86,10 +15,10 @@
       Country
       <input name="country" th:value="${country}" autocomplete="country-name" placeholder="USA">
     </label>
-    <button type="submit">検索</button>
+    <button type="submit">Search</button>
   </form>
 
-  <p class="message" th:if="${errorMessage}" th:text="${errorMessage}"></p>
+  <p class="error-message" th:if="${errorMessage}" th:text="${errorMessage}"></p>
 
   <table th:if="${products != null and !products.isEmpty()}">
     <thead>
@@ -112,7 +41,7 @@
     </tbody>
   </table>
 
-  <p class="empty" th:if="${country != null and !country.isBlank() and (products == null or products.isEmpty()) and errorMessage == null}">
+  <p class="empty" th:if="${noResults}">
     該当する商品はありません。
   </p>
 </main>
